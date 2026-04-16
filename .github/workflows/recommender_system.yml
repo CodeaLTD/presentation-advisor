@@ -1,0 +1,100 @@
+name: Recommender System CI
+
+on:
+  pull_request:
+    paths:
+      - "models/recommender_system/**"
+      - ".github/workflows/recommender_system.yml"
+      - ".ci/notebook-format-check.txt"
+      - "README.md"
+      - "SECURITY.md"
+      - "CONTRIBUTING.md"
+  push:
+    branches: [main]
+    paths:
+      - "models/recommender_system/**"
+      - ".github/workflows/recommender_system.yml"
+      - ".ci/notebook-format-check.txt"
+      - "README.md"
+      - "SECURITY.md"
+      - "CONTRIBUTING.md"
+  workflow_dispatch:
+
+jobs:
+  repo-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Validate OSS docs exist
+        run: |
+          test -f README.md
+          test -f LICENSE
+          test -f CONTRIBUTING.md
+          test -f CODE_OF_CONDUCT.md
+          test -f SECURITY.md
+
+      - name: Block placeholder contacts and registry values
+        run: |
+          ! grep -R -nE "security@invalid.local|your-dockerhub-username" README.md SECURITY.md CODE_OF_CONDUCT.md .github/workflows || (echo "Placeholder values found" && exit 1)
+
+      - name: Python syntax smoke check
+        run: |
+          python -m py_compile $(git ls-files "*.py")
+
+      - name: Validate recommender notebooks
+        run: |
+          python -m pip install --upgrade pip nbformat
+          python - <<'PY'
+          import pathlib
+          import nbformat
+
+          notebook_root = pathlib.Path("models/recommender_system/notebooks")
+          notebooks = sorted(
+              p for p in notebook_root.rglob("*.ipynb")
+              if ".ipynb_checkpoints" not in p.parts
+          )
+          if not notebooks:
+              raise SystemExit("No notebooks found to validate.")
+
+          for nb_path in notebooks:
+              with nb_path.open("r", encoding="utf-8") as f:
+                  nbformat.read(f, as_version=4)
+          print(f"Validated {len(notebooks)} notebooks")
+          PY
+
+      - name: Notebook formatting check (allowlist)
+        run: |
+          python -m pip install nbqa black
+          python - <<'PY'
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          allowlist = Path(".ci/notebook-format-check.txt")
+          if not allowlist.is_file():
+              sys.exit("Missing .ci/notebook-format-check.txt")
+
+          paths = []
+          for raw in allowlist.read_text(encoding="utf-8").splitlines():
+              line = raw.strip()
+              if not line or line.startswith("#"):
+                  continue
+              p = Path(line)
+              if not p.is_file():
+                  sys.exit(f"Allowlist entry not found: {line}")
+              paths.append(line)
+
+          if not paths:
+              sys.exit("Allowlist has no notebook paths (add paths or remove empty file).")
+
+          for nb in paths:
+              subprocess.run(["nbqa", "black", "--check", nb], check=True)
+          print(f"nbqa black --check passed for {len(paths)} notebook(s)")
+          PY

@@ -1,0 +1,70 @@
+# OS/editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+env/
+
+# Jupyter/ML artifacts
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+*.h5
+*.hdf5
+*.ckpt
+*.pb
+*.tflite
+*.onnx
+*.pkl
+*.joblib
+*.npy
+*.npz
+
+# Large archives and generated datasets/models
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+data/raw/
+data/interim/
+models/**/exported_model/
+models/**/logs/
+models/**/training-runs/
+
+# Node/frontend
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Logs/runtime
+*.log
+logs/
+tmp/
+temp/
+
+# Environment/secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json

@@ -1,0 +1,16 @@
+tensorflow==2.10.0
+jupyter
+pandas==2.3.1
+Pillow==11.3.0
+matplotlib==3.10.3
+opencv-python==4.8.1.78
+numpy==1.26.4
+scipy==1.11.4
+scikit-learn==1.4.2
+opencv-python==4.8.1.78
+ImageHash==4.3.2
+pdf2image==1.17.0
+python-pptx==1.0.2
+nbimporter==0.3.4
+#conda create -n tf_gpu python=3.10 pip cudatoolkit=11.2 cudnn=8.1 -c conda-forge -y
+#the working env tf_gpu

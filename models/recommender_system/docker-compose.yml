@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  tf-serving:
+    image: tensorflow/serving
+    container_name: tf-serving
+    ports:
+      - 8500:8500  # gRPC
+      - 8501:8501  # REST
+    volumes:
+      - ./exported_model:/models/recommender_model
+    environment:
+      - MODEL_NAME=recommender_model
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:

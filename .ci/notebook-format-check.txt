@@ -1,0 +1,5 @@
+# Notebooks checked by CI with `nbqa black --check`.
+# One path per line, relative to repo root. Lines starting with # are ignored.
+
+models/recommender_system/notebooks/RS-official algorithm.ipynb
+models/recommender_system/notebooks/dataset_generator.ipynb
